@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 论文速记站</title><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">论文速记站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">1 张卡片</p><section class="cards"><article data-tags="[&quot;VLA&quot;,&quot;机器人&quot;,&quot;Flow Matching&quot;]" data-search="π0.5：面向开放世界的机器人操作 通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。 π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 fast 离散动作监督，后训练引入 flow matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、attention mask 与 kv cache，并用两轮闭环实例串联完整信息流。此处为基于笔记整理的中文摘要。 
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 论文速记站</title><link rel="stylesheet" href="/assets/style.css?v=hover2"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">论文速记站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">1 张卡片</p><section class="cards"><article data-tags="[&quot;VLA&quot;,&quot;机器人&quot;,&quot;Flow Matching&quot;]" data-search="π0.5：面向开放世界的机器人操作 通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。 π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 fast 离散动作监督，后训练引入 flow matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、attention mask 与 kv cache，并用两轮闭环实例串联完整信息流。此处为基于笔记整理的中文摘要。 
 &gt; 按 kelip-paper-reading 的六站路线整理：动机 → 架构 → 训练 → 数据 → 信息流 → 两轮闭环实例。
 &gt; 整理与公开实现核对日期：2026-11-11。论文以 arxiv:2504.16054 v1 为准；代码为当日读取的 openpi main，未固定 commit，不能视为永久不变的接口。
 &gt; 来源范围：原聊天接口返回的是测试及整理阶段记录，没有返回更早的六站逐字对话。因此本文是根据可见聊天、用户列出的主题与原始资料重新整理的完整复习笔记，不声称逐字还原未取回的内容。
@@ -16,7 +16,7 @@
 
 ## ① 动机：为什么需要 π0.5？
 
-&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig2.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig2.png&quot; alt=&quot;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 悬停放大查看&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig2.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig2.png&quot; alt=&quot;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 
 
 ### 要解决的具体问题
@@ -37,7 +37,7 @@
 
 ## ② 架构：vlm、fast 与 action expert 分别干什么？
 
-&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig3.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig3.png&quot; alt=&quot;图 3｜模型总览：异构数据预训练、后训练与高低层推理。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 3｜模型总览：异构数据预训练、后训练与高低层推理。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 悬停放大查看&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig3.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig3.png&quot; alt=&quot;图 3｜模型总览：异构数据预训练、后训练与高低层推理。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 3｜模型总览：异构数据预训练、后训练与高低层推理。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 
 
 ### 模块地图
@@ -173,7 +173,7 @@ $$
 
 ## ④ 数据：一条样本到底是什么？
 
-&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig4.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig4.png&quot; alt=&quot;图 4｜预训练和后训练的数据组成与任务示例。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 4｜预训练和后训练的数据组成与任务示例。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 悬停放大查看&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig4.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig4.png&quot; alt=&quot;图 4｜预训练和后训练的数据组成与任务示例。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 4｜预训练和后训练的数据组成与任务示例。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 
 
 ### 六类数据不是六种完全相同格式的轨迹
@@ -235,7 +235,7 @@ $$
 
 ## ⑤ 信息流：attention mask、q/k/v 与 kv cache
 
-&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig18.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig18.png&quot; alt=&quot;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 悬停放大查看&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig18.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig18.png&quot; alt=&quot;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 
 
 ### 三块 mask：行是读取者，列是被读取者
@@ -322,7 +322,7 @@ expert 输出速度        [1,50,32]
 
 ## ⑥ 例子：18 维、50 步动作块，走完 t=0 与 t=1
 
-&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig7a.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig7a.png&quot; alt=&quot;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 悬停放大查看&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig7a.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig7a.png&quot; alt=&quot;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 
 
 以下控制频率、执行步数、相机数量与任务数值全部为**教学设定**。采用 20 hz 控制、每次预测 50 步、执行前 10 步后重新观测。预测覆盖 2.5 秒，重规划间隔 0.5 秒；不是推理耗时 0.5 秒，也不是论文固定部署参数。
@@ -437,4 +437,4 @@ x(τ=1) → x(0.9) → ... → x(0) → 适配成机器人动作
 - [tokenizer.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/tokenizer.py)：`paligemmatokenizer.tokenize` 的状态文本化；`fasttokenizer` 的离散动作接口。
 
 本文配图取自 π0.5 论文 v1，并保留自包含文字流程图辅助复习。所有教学数值已与论文报告和代码参数分开；复现实验时仍应固定代码 commit、模型配置、统计量与机器人接口。
- vla 机器人 flow matching"><details class="paper-card"><summary><h2>π0.5：面向开放世界的机器人操作</h2><p>通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 FAST 离散动作监督，后训练引入 Flow Matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、Attention Mask 与 KV Cache，并用两轮闭环实例串联完整信息流。此处为基于笔记整理的中文摘要。</p><a class="read" href="/papers/pi05/">详情 →</a></div></details></article></section><p id="empty" hidden>没有匹配的卡片，试试其他关键词。</p></main><script src="/assets/app.js" defer></script></html>
+ vla 机器人 flow matching"><details class="paper-card"><summary><h2>π0.5：面向开放世界的机器人操作</h2><p>通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 FAST 离散动作监督，后训练引入 Flow Matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、Attention Mask 与 KV Cache，并用两轮闭环实例串联完整信息流。此处为基于笔记整理的中文摘要。</p><a class="read" href="/papers/pi05/">详情 →</a></div></details></article></section><p id="empty" hidden>没有匹配的卡片，试试其他关键词。</p></main><script src="/assets/app.js?v=hover2" defer></script></html>

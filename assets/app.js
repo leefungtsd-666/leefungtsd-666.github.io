@@ -27,6 +27,9 @@ document.querySelectorAll('.cards article').forEach(card=>{
 // Figures enlarge in place; no modal obscures the notes.
 document.querySelectorAll('.paper-figure>a').forEach(link=>{
  link.removeAttribute('target');
+ link.addEventListener('pointerenter',event=>{if(event.pointerType!=='touch'){link.classList.add('is-zoomed');link.closest('figure').classList.add('zoom-active')}});
+ link.addEventListener('pointerleave',()=>{link.classList.remove('is-zoomed');link.closest('figure').classList.remove('zoom-active')});
+ link.addEventListener('pointercancel',()=>{link.classList.remove('is-zoomed');link.closest('figure').classList.remove('zoom-active')});
  link.setAttribute('aria-label','放大查看图片');
  link.addEventListener('click',event=>event.preventDefault());
 });

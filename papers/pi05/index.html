@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>π0.5：面向开放世界的机器人操作 · 论文速记站</title><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">论文速记站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="note"><a href="/">HOME</a><h1>π0.5：面向开放世界的机器人操作</h1><p class="summary">通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><blockquote>
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>π0.5：面向开放世界的机器人操作 · 论文速记站</title><link rel="stylesheet" href="/assets/style.css?v=hover2"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">论文速记站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="note"><a href="/">HOME</a><h1>π0.5：面向开放世界的机器人操作</h1><p class="summary">通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><blockquote>
 <p>按 kelip-paper-reading 的六站路线整理：动机 → 架构 → 训练 → 数据 → 信息流 → 两轮闭环实例。
 整理与公开实现核对日期：2026-11-11。论文以 arXiv:2504.16054 v1 为准；代码为当日读取的 openpi main，未固定 commit，不能视为永久不变的接口。
 来源范围：原聊天接口返回的是测试及整理阶段记录，没有返回更早的六站逐字对话。因此本文是根据可见聊天、用户列出的主题与原始资料重新整理的完整复习笔记，不声称逐字还原未取回的内容。</p>
@@ -13,7 +13,7 @@
 <p>核心公式使用数学排版；信息流与张量形状保留等宽文本，便于对照复习。文中 t 表示机器人控制轮次，τ 表示 Flow Matching 的噪声时间，两者不能混用。</p>
 <p>快速路线：先读第 1–2 站建立整体模型，再读第 3 站公式；第 4 站确定数据长相；第 5 站理解 Mask 与 Cache；第 6 站把所有内容串起来。最后用纠错表和自测检查。</p>
 <h2>① 动机：为什么需要 π0.5？</h2>
-<figure class="paper-figure"><a href="/assets/pi05/fig2.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig2.png" alt="图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。" loading="lazy" /></a><figcaption>图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a> · 悬停放大查看</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/pi05/fig2.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig2.png" alt="图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。" loading="lazy" /></a><figcaption>图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a></figcaption></figure>
 
 
 <h3>要解决的具体问题</h3>
@@ -25,7 +25,7 @@
 <p><strong>一句话复述：π0.5 的核心是异构共同训练和语义—动作结合，不只是把一个动作头接到 VLM 后面。</strong></p>
 <p>来源：<a href="https://arxiv.org/html/2504.16054v1">π0.5 正文与图 3</a>。</p>
 <h2>② 架构：VLM、FAST 与 Action Expert 分别干什么？</h2>
-<figure class="paper-figure"><a href="/assets/pi05/fig3.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig3.png" alt="图 3｜模型总览：异构数据预训练、后训练与高低层推理。" loading="lazy" /></a><figcaption>图 3｜模型总览：异构数据预训练、后训练与高低层推理。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a> · 悬停放大查看</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/pi05/fig3.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig3.png" alt="图 3｜模型总览：异构数据预训练、后训练与高低层推理。" loading="lazy" /></a><figcaption>图 3｜模型总览：异构数据预训练、后训练与高低层推理。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a></figcaption></figure>
 
 
 <h3>模块地图</h3>
@@ -219,7 +219,7 @@ u_{\mathrm{target}}=\epsilon-A
 <p>【实现】<code>sample_actions</code> 默认 N=10。不要写成固定 10 步的论文普适定律。由于 Δτ&lt;0，更新是沿噪声到数据方向走；若采用相反时间约定，插值式、目标速度与积分方向必须一起改变。</p>
 <p>来源：<a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py">pi0.py 的 compute_loss 与 sample_actions</a>。</p>
 <h2>④ 数据：一条样本到底是什么？</h2>
-<figure class="paper-figure"><a href="/assets/pi05/fig4.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig4.png" alt="图 4｜预训练和后训练的数据组成与任务示例。" loading="lazy" /></a><figcaption>图 4｜预训练和后训练的数据组成与任务示例。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a> · 悬停放大查看</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/pi05/fig4.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig4.png" alt="图 4｜预训练和后训练的数据组成与任务示例。" loading="lazy" /></a><figcaption>图 4｜预训练和后训练的数据组成与任务示例。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a></figcaption></figure>
 
 
 <h3>六类数据不是六种完全相同格式的轨迹</h3>
@@ -320,7 +320,7 @@ u_{\mathrm{target}}=\epsilon-A
 <p>补齐到 32 维是模型/适配器约定，不能说机器人突然多了 14 个执行器。补齐维度是否参与损失、如何逆变换，需要核对具体配置；不要默认存在一个未看到的 loss mask。</p>
 <p>来源：<a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/tokenizer.py">tokenizer.py</a>、<a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py">pi0.py</a>。</p>
 <h2>⑤ 信息流：Attention Mask、Q/K/V 与 KV Cache</h2>
-<figure class="paper-figure"><a href="/assets/pi05/fig18.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig18.png" alt="图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。" loading="lazy" /></a><figcaption>图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a> · 悬停放大查看</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/pi05/fig18.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig18.png" alt="图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。" loading="lazy" /></a><figcaption>图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a></figcaption></figure>
 
 
 <h3>三块 Mask：行是读取者，列是被读取者</h3>
@@ -409,7 +409,7 @@ Expert 输出速度        [1,50,32]
 <p>与自回归缓存比较：FAST 生成时通常逐 token 增长缓存；Flow Matching 时复用固定 Prefix，重新计算整块动作。进入新观测轮次后，普通 openpi 路径重新建立 Prefix 缓存，不是把旧环境缓存一直追加下去。</p>
 <p>来源：<a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/gemma.py">gemma.py</a>、<a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/pi0.py">sample_actions</a>。</p>
 <h2>⑥ 例子：18 维、50 步动作块，走完 t=0 与 t=1</h2>
-<figure class="paper-figure"><a href="/assets/pi05/fig7a.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig7a.png" alt="图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。" loading="lazy" /></a><figcaption>图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a> · 悬停放大查看</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/pi05/fig7a.png" target="_blank" rel="noopener"><img src="/assets/pi05/fig7a.png" alt="图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。" loading="lazy" /></a><figcaption>图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。 <a href="https://arxiv.org/html/2504.16054v1">来源：π0.5 论文 v1</a></figcaption></figure>
 
 
 <p>以下控制频率、执行步数、相机数量与任务数值全部为<strong>教学设定</strong>。采用 20 Hz 控制、每次预测 50 步、执行前 10 步后重新观测。预测覆盖 2.5 秒，重规划间隔 0.5 秒；不是推理耗时 0.5 秒，也不是论文固定部署参数。</p>
@@ -591,4 +591,4 @@ x(τ=1) → x(0.9) → ... → x(0) → 适配成机器人动作
 <li><a href="https://github.com/Physical-Intelligence/openpi/blob/main/src/openpi/models/tokenizer.py">tokenizer.py</a>：<code>PaligemmaTokenizer.tokenize</code> 的状态文本化；<code>FASTTokenizer</code> 的离散动作接口。</li>
 </ul>
 <p>本文配图取自 π0.5 论文 v1，并保留自包含文字流程图辅助复习。所有教学数值已与论文报告和代码参数分开；复现实验时仍应固定代码 commit、模型配置、统计量与机器人接口。</p>
-</div></main><script src="/assets/app.js" defer></script></html>
+</div></main><script src="/assets/app.js?v=hover2" defer></script></html>
