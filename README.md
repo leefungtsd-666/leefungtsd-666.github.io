@@ -20,3 +20,6 @@ GitHub Settings → Pages → Source 选择 GitHub Actions。推送 main 自动�
 旧站完整保存在 backup/pre-paper-site 分支；Git 历史未重写。恢复时可从该分支建立新分支或恢复文件后提交。仓库外另有完整 Git bundle 备份。
 
 当前三个条目均为格式示例，不是用户真实已读记录。
+
+## 三层阅读
+首页仅以搜索框和简洁卡片开始。summary 是封面的一句话总结；abstract 是点击卡片展开的摘要；Markdown 正文是点击“详情”进入的完整笔记。搜索也包含标签与摘要。卡片支持键盘 Enter/空格展开与收起。
