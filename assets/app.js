@@ -24,14 +24,9 @@ document.querySelectorAll('.cards article').forEach(card=>{
  });
  card.addEventListener('pointerleave',reset);card.addEventListener('pointercancel',reset);card.addEventListener('click',reset);tiltAllowed.addEventListener('change',reset);
 });
-const imageLinks=document.querySelectorAll('.paper-figure>a');
-if(imageLinks.length){
- const viewer=document.createElement('dialog');viewer.className='image-viewer';viewer.setAttribute('aria-label','论文图片预览');
- viewer.innerHTML='<button class="image-close" aria-label="关闭图片预览" autofocus>×</button><img alt=""><p></p>';document.body.append(viewer);
- let imageTrigger;
- function closeImage(){viewer.close();document.body.style.overflow='';imageTrigger?.focus()}
- viewer.querySelector('button').onclick=closeImage;
- viewer.addEventListener('cancel',e=>{e.preventDefault();closeImage()});
- viewer.addEventListener('click',e=>{if(e.target===viewer)closeImage()});
- imageLinks.forEach(link=>link.addEventListener('click',e=>{e.preventDefault();imageTrigger=link;const img=link.querySelector('img');viewer.querySelector('img').src=link.href;viewer.querySelector('img').alt=img.alt;viewer.querySelector('p').textContent=img.alt;viewer.showModal();document.body.style.overflow='hidden'}));
-}
+// Figures enlarge in place; no modal obscures the notes.
+document.querySelectorAll('.paper-figure>a').forEach(link=>{
+ link.removeAttribute('target');
+ link.setAttribute('aria-label','放大查看图片');
+ link.addEventListener('click',event=>event.preventDefault());
+});
