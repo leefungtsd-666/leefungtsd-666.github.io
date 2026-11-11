@@ -16,6 +16,9 @@
 
 ## ① 动机：为什么需要 π0.5？
 
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig2.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig2.png&quot; alt=&quot;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 2｜未见过的厨房中的任务执行。高层子任务与低层动作配合完成操作。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 点击查看原图&lt;/figcaption&gt;&lt;/figure&gt;
+
+
 ### 要解决的具体问题
 
 【论文】π0.5（physical intelligence，2025）面向开放世界中的机器人操作：机器人进入训练时没见过的家庭，仍能按照指令完成整理厨房、收拾卧室等长任务。输入包括视觉、语言和机器人本体状态，输出最终落到连续机器人动作。
@@ -33,6 +36,9 @@
 来源：[π0.5 正文与图 3](https://arxiv.org/html/2504.16054v1)。
 
 ## ② 架构：vlm、fast 与 action expert 分别干什么？
+
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig3.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig3.png&quot; alt=&quot;图 3｜模型总览：异构数据预训练、后训练与高低层推理。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 3｜模型总览：异构数据预训练、后训练与高低层推理。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 点击查看原图&lt;/figcaption&gt;&lt;/figure&gt;
+
 
 ### 模块地图
 
@@ -159,6 +165,9 @@ l_fm = e[ ||vθ(xτ,τ,p) − (ε−a)||² ]
 
 ## ④ 数据：一条样本到底是什么？
 
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig4.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig4.png&quot; alt=&quot;图 4｜预训练和后训练的数据组成与任务示例。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 4｜预训练和后训练的数据组成与任务示例。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 点击查看原图&lt;/figcaption&gt;&lt;/figure&gt;
+
+
 ### 六类数据不是六种完全相同格式的轨迹
 
 | 缩写 | 数据类型 | 主要提供的监督 |
@@ -217,6 +226,9 @@ l_fm = e[ ||vθ(xτ,τ,p) − (ε−a)||² ]
 来源：[tokenizer.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/tokenizer.py)、[pi0.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/pi0.py)。
 
 ## ⑤ 信息流：attention mask、q/k/v 与 kv cache
+
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig18.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig18.png&quot; alt=&quot;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 18｜论文中的注意力掩码。结合下文的行列定义理解信息读取方向。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 点击查看原图&lt;/figcaption&gt;&lt;/figure&gt;
+
 
 ### 三块 mask：行是读取者，列是被读取者
 
@@ -298,6 +310,9 @@ expert 输出速度        [1,50,32]
 来源：[gemma.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/gemma.py)、[sample_actions](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/pi0.py)。
 
 ## ⑥ 例子：18 维、50 步动作块，走完 t=0 与 t=1
+
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/pi05/fig7a.png&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;&lt;img src=&quot;/assets/pi05/fig7a.png&quot; alt=&quot;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。&quot; loading=&quot;lazy&quot; /&gt;&lt;/a&gt;&lt;figcaption&gt;图 7a｜真实家庭任务执行序列。下文的两轮数值例子是教学设定，与本图实验记录分开。 &lt;a href=&quot;https://arxiv.org/html/2504.16054v1&quot;&gt;来源：π0.5 论文 v1&lt;/a&gt; · 点击查看原图&lt;/figcaption&gt;&lt;/figure&gt;
+
 
 以下控制频率、执行步数、相机数量与任务数值全部为**教学设定**。采用 20 hz 控制、每次预测 50 步、执行前 10 步后重新观测。预测覆盖 2.5 秒，重规划间隔 0.5 秒；不是推理耗时 0.5 秒，也不是论文固定部署参数。
 
@@ -410,5 +425,5 @@ x(τ=1) → x(0.9) → ... → x(0) → 适配成机器人动作
 - [gemma.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/gemma.py)：`get_config`、attention 投影与缓存。
 - [tokenizer.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/tokenizer.py)：`paligemmatokenizer.tokenize` 的状态文本化；`fasttokenizer` 的离散动作接口。
 
-本文未嵌入未核对的论文插图，以自包含文字流程图表达信息流。所有教学数值已与论文报告和代码参数分开；复现实验时仍应固定代码 commit、模型配置、统计量与机器人接口。
+本文配图取自 π0.5 论文 v1，并保留自包含文字流程图辅助复习。所有教学数值已与论文报告和代码参数分开；复现实验时仍应固定代码 commit、模型配置、统计量与机器人接口。
  vla 机器人 flow matching"><details class="paper-card"><summary><h2>π0.5：面向开放世界的机器人操作</h2><p>通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 FAST 离散动作监督，后训练引入 Flow Matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、Attention Mask 与 KV Cache，并用两轮闭环实例串联完整信息流。此处为基于笔记整理的中文摘要。</p><a class="read" href="/papers/pi05/">详情 →</a></div></details></article></section><p id="empty" hidden>没有匹配的卡片，试试其他关键词。</p></main><script src="/assets/app.js" defer></script></html>
