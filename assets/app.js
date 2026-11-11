@@ -66,6 +66,6 @@ if(search){
  entry.onclick=()=>open();panel.querySelector('.tag-close').onclick=close;panel.querySelector('.tag-done').onclick=close;panel.addEventListener('click',e=>{if(e.target===panel){const r=panel.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close()}});
  panel.querySelector('.tag-clear').onclick=()=>{selected.clear();render();apply()};
  panel.querySelector('form').onsubmit=e=>{e.preventDefault();const input=panel.querySelector('input'),name=input.value.trim();if(!name)return;if(state.labels.includes(name)){status.textContent='该标签已存在。';return}state.labels.push(name);state.deleted=state.deleted.filter(t=>t!==name);if(editing)state.papers[editing]=[...(state.papers[editing]||[]),name];input.value='';persist();render();apply();status.textContent='已添加“'+name+'”。'};
- for(const card of cards){const box=document.createElement('div');box.className='card-labels';const edit=document.createElement('button');edit.className='edit-tags';edit.textContent='＋';edit.setAttribute('aria-label','添加论文标签');edit.onclick=e=>{e.stopPropagation();open(card.dataset.id)};card.append(box,edit)}
+ for(const card of cards){const box=document.createElement('div');box.className='card-labels';const edit=document.createElement('button');edit.className='edit-tags';edit.textContent='＋';edit.setAttribute('aria-label','添加论文标签');edit.onclick=e=>{e.stopPropagation();open(card.dataset.id)};card.append(box)}
  search.oninput=apply;apply();
 }
