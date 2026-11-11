@@ -1,4 +1,4 @@
-# 论文速记站
+# 🌰小站
 
 中文 Markdown 论文卡片，使用 Node.js + marked 静态生成，无客户端框架。适合 GitHub Pages。
 
