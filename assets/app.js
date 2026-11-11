@@ -7,3 +7,20 @@ modal.querySelector('.modal-close').onclick=closeModal;
 modal.addEventListener('cancel',e=>{e.preventDefault();closeModal()});
 modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal()}});
 document.querySelectorAll('.paper-card summary').forEach(card=>card.addEventListener('click',e=>{e.preventDefault();openingCard=card;const r=card.getBoundingClientRect();modal.style.setProperty('--origin-x',`${r.left+r.width/2-innerWidth/2}px`);modal.style.setProperty('--origin-y',`${r.top+r.height/2-innerHeight/2}px`);modal.querySelector('.modal-content').innerHTML=card.innerHTML.replace(/<span class="expand-hint">.*?<\/span>/,'')+card.nextElementSibling.outerHTML;modal.setAttribute('aria-label',card.querySelector('h2').textContent);modal.showModal();document.body.style.overflow='hidden'}));
+const tiltAllowed=matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+document.querySelectorAll('.cards article').forEach(card=>{
+ let frame=0;
+ const reset=()=>{cancelAnimationFrame(frame);for(const key of ['--rx','--ry','--mx','--my','--sx','--glow'])card.style.removeProperty(key)};
+ card.addEventListener('pointermove',event=>{
+  if(!tiltAllowed.matches)return;
+  const rect=card.getBoundingClientRect();
+  const x=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
+  const y=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
+  cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{
+   card.style.setProperty('--rx',`${(0.5-y)*10}deg`);card.style.setProperty('--ry',`${(x-0.5)*10}deg`);
+   card.style.setProperty('--mx',`${x*100}%`);card.style.setProperty('--my',`${y*100}%`);
+   card.style.setProperty('--sx',`${(0.5-x)*16}px`);card.style.setProperty('--glow','1');
+  });
+ });
+ card.addEventListener('pointerleave',reset);card.addEventListener('pointercancel',reset);card.addEventListener('click',reset);tiltAllowed.addEventListener('change',reset);
+});
