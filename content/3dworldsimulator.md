@@ -370,6 +370,8 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 ### Figure 3 · 多视角预测对比
 
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure3.png"><img src="/assets/3dworldsimulator/figure3.png" alt="Figure 3 · 多视角预测对比" loading="lazy"></a><figcaption>Figure 3 · 多视角预测对比，摘自原论文第 6 页。</figcaption></figure>
+
 [查看原论文 Figure 3（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较 Part Assembly 和 Cloth Folding 在 Front、Top、Wrist 不同视角下的预测。
@@ -377,6 +379,8 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 重点观察作者方法与 4DGen、IWS、Cosmos 在长序列预测中出现的多视角不一致、视觉形变和结构错误。
 
 ### Figure 4 · 三维点云预测对比
+
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure4.png"><img src="/assets/3dworldsimulator/figure4.png" alt="Figure 4 · 三维点云预测对比" loading="lazy"></a><figcaption>Figure 4 · 三维点云预测对比，摘自原论文第 6 页。</figcaption></figure>
 
 [查看原论文 Figure 4（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
@@ -388,11 +392,15 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 ### Figure 6 · 用世界模型生成数据训练机器人策略
 
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure6.png"><img src="/assets/3dworldsimulator/figure6.png" alt="Figure 6 · 用世界模型生成数据训练机器人策略" loading="lazy"></a><figcaption>Figure 6 · 用世界模型生成数据训练机器人策略，摘自原论文第 8 页。</figcaption></figure>
+
 [查看原论文 Figure 6（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较使用真实世界数据与世界模型生成数据训练策略，最后在真实机器人上的任务成功率。
 
 ### Figure 7 · 仿真与真实世界的策略评估相关性
+
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure7.png"><img src="/assets/3dworldsimulator/figure7.png" alt="Figure 7 · 仿真与真实世界的策略评估相关性" loading="lazy"></a><figcaption>Figure 7 · 仿真与真实世界的策略评估相关性，摘自原论文第 9 页。</figcaption></figure>
 
 [查看原论文 Figure 7（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
@@ -403,6 +411,8 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 这张图的意义是判断世界模型能否成为真实机器人策略评估的代理环境。
 
 ### Figure 8 · 未见物体的模型规划
+
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure8.png"><img src="/assets/3dworldsimulator/figure8.png" alt="Figure 8 · 未见物体的模型规划" loading="lazy"></a><figcaption>Figure 8 · 未见物体的模型规划，摘自原论文第 9 页。</figcaption></figure>
 
 [查看原论文 Figure 8（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
