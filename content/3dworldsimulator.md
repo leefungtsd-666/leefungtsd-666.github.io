@@ -32,6 +32,8 @@ related: ['pi05']
 
 ### Figure 1 · 整体任务与应用
 
+<figure class="paper-figure"><a href="/assets/3dworldsimulator/figure1.png"><img src="/assets/3dworldsimulator/figure1.png" alt="Figure 1：统一三维状态生成多视角 RGB-D 与触觉观测，并支持多种机器人操作任务" loading="lazy"></a><figcaption>Figure 1 · 3D World Simulator 整体框架，摘自原论文首页。</figcaption></figure>
+
 [查看原论文 Figure 1（PDF 首页）](https://jwang771.github.io/3dworldsimulator/paper.pdf#page=1)
 
 **读图重点：**
