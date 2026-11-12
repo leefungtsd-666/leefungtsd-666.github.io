@@ -1,4 +1,471 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=close-polish"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><a class="site-name" href="/">🌰小站</a><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">1 张卡片</p><section class="cards"><article data-id="pi05" data-tags="[&quot;VLA&quot;,&quot;机器人&quot;,&quot;Flow Matching&quot;]" data-search="π0.5：面向开放世界的机器人操作 通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。 π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 fast 离散动作监督，后训练引入 flow matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、attention mask 与 kv cache，并用两轮闭环实例串联完整信息流。 
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=close-polish"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><a class="site-name" href="/">🌰小站</a><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">2 张卡片</p><section class="cards"><article data-id="3dworldsimulator" data-tags="[&quot;世界模型&quot;,&quot;三维重建&quot;,&quot;机器人&quot;]" data-search="3d world simulator：粒子与体素混合的三维世界模型 用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。 hybrid particle-voxel dynamics 将三维表示学习与动作条件动力学分为两个主要阶段：先用混合粒子—体素自编码器压缩和重建场景，再在固定空间结构的 voxel latent 中预测未来状态。笔记涵盖架构、训练损失、自回归预测、数据与张量信息流，并记录自适应体素、抗飞点重建和 flow matching 后训练等个人研究设想。 
+**论文：** hybrid particle-voxel dynamics for multimodal 3d world simulation  
+**作者：** jimmy wang et al.  
+**发表：** arxiv，2026.11  
+**论文：** https://arxiv.org/abs/2611.04492  
+**项目：** https://jwang771.github.io/3dworldsimulator/  
+**代码：** https://github.com/jwang771/3d-world-simulator
+
+**精读进度：** ① 动机 ✓ · ② 架构 ✓ · ③ 训练 ✓ · ④ 数据 ✓ · ⑤ 信息流 ✓ · ⑥ 数字案例待完成
+
+---
+
+## 一、研究动机：为什么需要三维世界模型？
+
+### 1.1 论文要解决什么？
+
+传统视频世界模型通常预测未来 rgb 图像，但是不同视角之间可能存在三维几何不一致的问题。
+
+3d world simulator 希望直接预测统一的三维场景，然后根据这一场景生成不同视角的图像、点云和触觉信息。
+
+**输入：历史三维状态 + 机器人动作。**
+
+**输出：未来三维状态，并可解码为三维粒子、rgb-d 图像及触觉观测。**
+
+### figure 1 · 整体任务与应用
+
+[查看原论文 figure 1（pdf 首页）](https://jwang771.github.io/3dworldsimulator/paper.pdf#page=1)
+
+**读图重点：**
+
+- **中央：** action-conditioned 3d world simulation，表示机器人动作条件下的三维世界预测。
+- **左上：** 从同一预测三维状态渲染不同视角的 rgb-d 图像。
+- **左下：** 预测与三维位置对齐的触觉信息。
+- **右侧：** cloth folding、part assembly、box packing、rope threading、t pushing、marker insertion 六种操作任务。
+
+**一句话：作者希望一个三维预测状态能够同时服务于几何、视觉和触觉，而不是分别预测互不关联的二维画面。**
+
+### 1.2 为什么使用 particle + voxel？
+
+| 表示 | 优势 | 不足 |
+|---|---|---|
+| particle | 适合恢复精细、连续的三维几何 | 普通无序点云缺少跨帧点身份对应 |
+| voxel | 固定空间网格，有利于时序预测 | 分辨率不足会损失细节 |
+| voxel latent | 结构稳定，方便压缩和动力学建模 | 压缩过强可能丢失关键几何 |
+
+核心思想：
+
+**particle 负责精细几何，voxel latent 负责稳定的三维动态预测。**
+
+voxel 的优势不是天然比点云计算量低，而是其固定空间位置提供了更稳定的预测目标。
+
+---
+
+## 二、模型架构（architecture）
+
+这是论文最重要的部分，建议复习时优先看 figure 2。
+
+### 2.1 figure 2(a) · hybrid particle-voxel autoencoder
+
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/method_ae.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/method_ae.png&quot; alt=&quot;figure 2(a) — hybrid particle-voxel autoencoder&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;/figure&gt;
+
+*图片来源：原论文 figure 2(a)，作者官方项目页面。*
+
+**从左到右读图：**
+
+1. **input point cloud $p_t$**：输入三维点云。
+2. **encoder $e_\theta$**：通过体素化和 sparse 3d convolution 压缩。
+3. **3d latent $z_t$**：得到具有三维空间结构的 voxel latent。
+4. **voxel upsampling**：逐级上采样恢复更细的体素。
+5. **particle decoder**：在连续三维空间中生成粒子。
+6. **rendered images**：利用 3d gaussian 参数渲染多视角图像。
+
+#### 输入点云
+
+论文定义：
+
+$$
+p_t\in\mathbb{r}^{7\times n}
+$$
+
+每个点包含：
+
+- xyz：三维坐标。
+- rgb：颜色。
+- tactile：触觉通道。
+
+#### voxel latent
+
+aloha 配置：
+
+$$
+z_t\in\mathbb{r}^{32\times16\times32\times8}
+$$
+
+前三个维度表示空间网格数量，最后的 8 表示每个体素的特征维度。
+
+因此共有 16,384 个空间位置，每个位置有一个 8 维特征向量。
+
+这些特征是 encoder 学出来的，不是预先定义的物理属性。
+
+#### decoder 为什么要恢复 particle？
+
+低分辨率 voxel latent 不足以直接表达精细的毛巾边缘和褶皱，因此 decoder 先恢复更细的占据体素，再生成连续粒子。
+
+视觉粒子携带 3d gaussian 参数，可以从不同视角渲染 rgb-d 图像；有触觉监督时，也可以生成空间对齐的触觉粒子。
+
+**记忆：encoder 学会压缩世界，decoder 学会恢复世界。**
+
+### 2.2 figure 2(b) · 3d latent dynamics model
+
+&lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/method_dyn.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/method_dyn.png&quot; alt=&quot;figure 2(b) — 3d latent dynamics model&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;/figure&gt;
+
+*图片来源：原论文 figure 2(b)，作者官方项目页面。*
+
+**从左到右读图：**
+
+1. **current latent $z_t$**：当前三维场景的隐空间。
+2. **history latents**：过去多个时刻的隐空间。
+3. **robot actions**：机器人动作条件。
+4. **3d convolutions**：融合空间特征并降低空间分辨率。
+5. **spatiotemporal attention**：学习空间关系和时间变化。
+6. **未来 latent**：预测 $z_{t+1},z_{t+2},\ldots$。
+7. **decoded point cloud / rendered images**：解码生成三维场景及视觉观测。
+
+核心公式：
+
+$$
+\hat z_{t+1}=f_\phi(z_{t-h:t},a_t)
+$$
+
+**dynamics model 预测的是未来 voxel latent，而不是直接预测 rgb 视频。**
+
+### 2.3 为什么要进行空间下采样？
+
+以论文 aloha 配置中的空间尺寸为例：
+
+`32×16×32 → 16×8×16 → 8×4×8`
+
+空间位置数量：
+
+`16,384 → 2,048 → 256`
+
+随着空间尺寸降低，特征通道数通常增加。
+
+这意味着模型从高空间分辨率、低维特征，逐渐变成低空间分辨率、高维特征。
+
+**两次空间下采样不等于只有两个卷积层。**
+
+论文中的空间下采样与公开 coarsedynamics3d 代码的具体配置存在差异；公开代码还包含多级卷积块、池化和上采样。
+
+### 2.4 attention 的作用
+
+| 类型 | 作用 |
+|---|---|
+| spatial attention | 同一帧中不同空间位置的信息交互 |
+| temporal attention | 不同时间的空间特征交互 |
+
+spatial attention 可以帮助模型理解毛巾局部变化如何影响其他区域。
+
+temporal attention 可以帮助模型理解某个空间位置随时间发生的变化。
+
+论文总体架构使用时空 attention；此前查看的公开 coarsedynamics3d 实现显式使用 temporal attention，而空间关系主要通过 3d convolution 处理。
+
+---
+
+## 三、训练方法与 loss
+
+### 3.1 两个主要训练阶段
+
+**第一阶段：autoencoder training**
+
+学习如何从点云编码出 voxel latent，再恢复高质量三维场景。
+
+**第二阶段：dynamics training**
+
+固定已经训练好的 autoencoder，将真实三维序列编码为 latent 序列，训练模型预测未来状态。
+
+中间的 `export_latents.py` 属于数据准备，而不是独立模型训练阶段。
+
+### 3.2 autoencoder 的四个 loss
+
+| loss | 作用 |
+|---|---|
+| voxel loss | 监督体素占据和相关特征重建 |
+| particle loss | 监督三维粒子几何与属性 |
+| render loss | 监督渲染 rgb-d 结果 |
+| consistency loss | 约束同一场景不同采样的 latent 一致性 |
+
+#### consistency loss
+
+同一个场景产生不同点云采样：
+
+`p_a → encoder → z_a`
+
+`p_b → encoder → z_b`
+
+希望：
+
+$$
+z_a\approx z_b
+$$
+
+原论文通过同一场景不同点云采样构造一致性监督。
+
+它的主要意义是减弱点云采样变化对 latent 的影响，使后续 dynamics model 更容易学习实际状态变化。
+
+但不能要求所有不同场景都编码成相同的 latent，否则可能发生 representation collapse。
+
+### 3.3 dynamics loss
+
+根据真实历史和动作预测未来：
+
+$$
+\hat z_{t+1}=f_\phi(z_{\mathrm{history}},a_t)
+$$
+
+然后与真实未来 $z_{t+1}$ 比较。
+
+主要使用未来 latent 的加权预测误差，并在多步预测中对不同时间步进行折扣。
+
+论文使用时间折扣系数 $\gamma=0.95$。
+
+### 3.4 autoregressive training
+
+训练时不能总依靠真实历史状态，否则推理时输入自身预测，可能出现 exposure bias。
+
+因此模型在训练时：
+
+1. 根据真实历史预测下一帧。
+2. 计算 loss。
+3. 把预测的 latent 加入历史。
+4. 输入下一时刻的动作。
+5. 继续预测并计算新的 loss。
+
+官方代码使用 `pred.detach()` 更新历史，避免后续损失通过这条路径跨时间步反传。
+
+### 3.5 gaussian noise augmentation
+
+训练时对历史 latent 添加高斯噪声：
+
+$$
+\tilde z_t=z_t+\epsilon,\qquad
+\epsilon\sim\mathcal n(0,\sigma^2i)
+$$
+
+作用是让模型适应不准确的历史输入，增强鲁棒性，并缓解长期预测中的误差累积。
+
+**这里加入高斯噪声，并不意味着使用 diffusion。**
+
+论文 dynamics model 直接预测未来 latent，没有采用 flow matching 或多步扩散去噪。
+
+---
+
+## 四、训练数据（dataset）
+
+### 4.1 数据来源
+
+论文包含六种 aloha 机器人任务，并在 deform360 等多物体数据上进行实验。
+
+原始数据通常包含：
+
+- rgb 和 depth 图像。
+- 相机内参和外参。
+- 机器人动作。
+- 有效像素与过滤掩码。
+- 可选的触觉数据。
+
+多相机 rgb-d 观测通过相机参数反投影和坐标变换，构成统一世界坐标系中的点云。
+
+### 4.2 aloha 动作
+
+动作张量：
+
+`(t, 14)`
+
+左右两条机械臂分别提供 7 维：
+
+- 3 维位置。
+- 3 维旋转。
+- 1 维夹爪状态。
+
+机器人动作是 dynamics model 的条件输入，而不是由 dynamics model 自己生成。
+
+### 4.3 两个模型需要的数据不同
+
+autoencoder 可以使用单帧点云进行三维表示学习。
+
+dynamics model 则需要时间连续的真实状态序列和对应机器人动作。
+
+因此，只有静态点云可以训练重建模型，却不足以学习动作条件下的动态变化。
+
+---
+
+## 五、输入输出信息流
+
+### 5.1 张量结构
+
+以 channel-first 的 pytorch 格式为例：
+
+`z_hist.shape = (b, t, 8, 32, 16, 32)`
+
+其中：
+
+- b：batch size。
+- t：历史帧数。
+- 8：voxel latent 通道数。
+- 32、16、32：三维空间分辨率。
+
+动作：
+
+`actions.shape = (b, t, 14)`
+
+### 5.2 连续两轮预测
+
+假设历史窗口为 8 帧。
+
+**第一次：**
+
+输入 `z0–z7` 与对应动作条件。
+
+输出 `z8_hat`。
+
+与真实 `z8` 计算 loss。
+
+**第二次：**
+
+输入 `z1–z7` 和 `z8_hat`，再提供下一时刻动作。
+
+输出 `z9_hat`。
+
+与真实 `z9` 计算 loss。
+
+之后重复这个过程。
+
+### 5.3 为什么不需要每次重新解码？
+
+因为 dynamics model 的输入和输出都是 voxel latent。
+
+只需：
+
+`预测 latent → 更新历史 → 再预测`
+
+不需要每一步都执行：
+
+`latent → particle → encoder → latent`
+
+只有需要三维几何、视觉观测或外部 policy 输入时，才需要 decoder。
+
+### 5.4 动作来源
+
+训练时来自机器人演示轨迹；开环预测时来自预先记录的动作序列；闭环交互时则可以由 policy 或 planner 提供。
+
+**policy 负责选择动作，world model 负责预测动作产生的结果。**
+
+---
+
+## 六、实验结果与原论文图示
+
+这一节作为后续第七站实验分析的复习入口。
+
+### figure 3 · 多视角预测对比
+
+[查看原论文 figure 3（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
+
+**读图重点：** 比较 part assembly 和 cloth folding 在 front、top、wrist 不同视角下的预测。
+
+重点观察作者方法与 4dgen、iws、cosmos 在长序列预测中出现的多视角不一致、视觉形变和结构错误。
+
+### figure 4 · 三维点云预测对比
+
+[查看原论文 figure 4（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
+
+**读图重点：** 比较 marker insertion、rope threading、t pushing 的预测点云与真实点云。
+
+这一张与你关注的 flying points 问题最相关。
+
+重点观察离群点、几何结构偏移、缺失区域，以及长时间自回归预测造成的误差。
+
+### figure 6 · 用世界模型生成数据训练机器人策略
+
+[查看原论文 figure 6（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
+
+**读图重点：** 比较使用真实世界数据与世界模型生成数据训练策略，最后在真实机器人上的任务成功率。
+
+### figure 7 · 仿真与真实世界的策略评估相关性
+
+[查看原论文 figure 7（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
+
+**读图重点：** 横轴为真实世界成功率，纵轴为世界模型中的成功率。
+
+论文也包含 π0.5 等 policy 的评估结果。
+
+这张图的意义是判断世界模型能否成为真实机器人策略评估的代理环境。
+
+### figure 8 · 未见物体的模型规划
+
+[查看原论文 figure 8（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
+
+**读图重点：** initial state、planning、final state 和 target。
+
+用于理解作者如何将世界模型用于未见物体的规划任务。
+
+---
+
+## 七、关键知识复习
+
+**q1：为什么选 voxel？**
+
+因为固定空间网格让未来状态预测具有稳定的空间对应目标。
+
+**q2：为什么还需要 particle？**
+
+因为模型需要恢复高质量连续三维几何。
+
+**q3：为什么分两个主要阶段训练？**
+
+先学会表示和重建世界，再学习世界如何随动作变化。
+
+**q4：consistency loss 为什么重要？**
+
+同一场景的不同点云采样不应该产生剧烈变化的 latent。
+
+**q5：为什么使用多步自回归训练？**
+
+因为实际推理时会持续使用自身预测作为历史状态。
+
+**q6：为什么添加高斯噪声？**
+
+提高对不准确历史输入的鲁棒性。
+
+**q7：为什么下一帧预测还需要动作？**
+
+相同状态下，不同动作会产生不同的未来。
+
+**q8：dynamics model 使用 flow matching 吗？**
+
+原论文不使用，主要采用直接的下一状态 latent 预测。
+
+**理解测试累计：34/37。**
+
+---
+
+## 八、我的研究设想（简记）
+
+**1. 自适应 voxel 与多尺度 latent**
+
+尝试使用粗体素描述整体运动，在接触、折叠及不确定性较高的区域保留精细特征，降低计算量。
+
+**2. vggt 置信度与 consistency loss**
+
+利用同一张图像在不同置信度筛选下产生的点云训练 encoder，提高三维表示对点云质量差异的鲁棒性。
+
+**3. 抗飞点 reconstruction loss**
+
+向输入点云加入飞点等扰动，使用干净几何作为重建监督，探索 quality-aware reconstruction loss，减少飞点对隐空间的影响。
+
+**4. 自生成历史训练**
+
+借鉴 π0.5 讨论中的 teacher forcing 与 scheduled sampling 思路，研究模型使用自身预测作为历史输入时的长期稳定性。
+
+**5. flow matching 后训练**
+
+在已有 dynamics model 基础上尝试 flow matching，用于未来 voxel latent 生成或残差修正，评估预测质量与额外推理成本。
+
+**总体目标：** 探索一种计算效率更高、抗飞点能力更强、长期动态预测更稳定的三维世界模型。
+
+*上述内容均为待验证的研究设想，并非原论文已实现的模块或已证实的创新。*
+ 世界模型 三维重建 机器人"><details class="paper-card"><summary><h2>3D World Simulator：粒子与体素混合的三维世界模型</h2><p>用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>Hybrid Particle-Voxel Dynamics 将三维表示学习与动作条件动力学分为两个主要阶段：先用混合粒子—体素自编码器压缩和重建场景，再在固定空间结构的 Voxel Latent 中预测未来状态。笔记涵盖架构、训练损失、自回归预测、数据与张量信息流，并记录自适应体素、抗飞点重建和 Flow Matching 后训练等个人研究设想。</p><a class="read" href="/papers/3dworldsimulator/">详情 →</a></div></details></article><article data-id="pi05" data-tags="[&quot;VLA&quot;,&quot;机器人&quot;,&quot;Flow Matching&quot;]" data-search="π0.5：面向开放世界的机器人操作 通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。 π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 fast 离散动作监督，后训练引入 flow matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、attention mask 与 kv cache，并用两轮闭环实例串联完整信息流。 
 &gt; 按 kelip-paper-reading 的六站路线整理：动机 → 架构 → 训练 → 数据 → 信息流 → 两轮闭环实例。
 &gt; 整理与公开实现核对日期：2026-11-11。论文以 arxiv:2504.16054 v1 为准；代码为当日读取的 openpi main，未固定 commit，不能视为永久不变的接口。
 &gt; 来源范围：原聊天接口返回的是测试及整理阶段记录，没有返回更早的六站逐字对话。因此本文是根据可见聊天、用户列出的主题与原始资料重新整理的完整复习笔记，不声称逐字还原未取回的内容。
