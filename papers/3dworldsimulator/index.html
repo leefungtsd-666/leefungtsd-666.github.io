@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>3D World Simulator：粒子与体素混合的三维世界模型 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=close-polish"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="note"><a href="/">HOME</a><h1>3D World Simulator：粒子与体素混合的三维世界模型</h1><p class="summary">用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。</p><p><strong>论文：</strong> Hybrid Particle-Voxel Dynamics for Multimodal 3D World Simulation<br><strong>作者：</strong> Jimmy Wang et al.<br><strong>发表：</strong> arXiv，2026.11<br><strong>论文：</strong> <a href="https://arxiv.org/abs/2611.04492">https://arxiv.org/abs/2611.04492</a><br><strong>项目：</strong> <a href="https://jwang771.github.io/3dworldsimulator/">https://jwang771.github.io/3dworldsimulator/</a><br><strong>代码：</strong> <a href="https://github.com/jwang771/3d-world-simulator">https://github.com/jwang771/3d-world-simulator</a></p>
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>3D World Simulator：粒子与体素混合的三维世界模型 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=research-notes"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="note"><a href="/">HOME</a><h1>3D World Simulator：粒子与体素混合的三维世界模型</h1><p class="summary">用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。</p><p><strong>论文：</strong> Hybrid Particle-Voxel Dynamics for Multimodal 3D World Simulation<br><strong>作者：</strong> Jimmy Wang et al.<br><strong>发表：</strong> arXiv，2026.11<br><strong>论文：</strong> <a href="https://arxiv.org/abs/2611.04492">https://arxiv.org/abs/2611.04492</a><br><strong>项目：</strong> <a href="https://jwang771.github.io/3dworldsimulator/">https://jwang771.github.io/3dworldsimulator/</a><br><strong>代码：</strong> <a href="https://github.com/jwang771/3d-world-simulator">https://github.com/jwang771/3d-world-simulator</a></p>
 <p><strong>精读进度：</strong> ① 动机 ✓ · ② 架构 ✓ · ③ 训练 ✓ · ④ 数据 ✓ · ⑤ 信息流 ✓ · ⑥ 数字案例待完成</p>
 <hr>
 <h2>一、研究动机：为什么需要三维世界模型？</h2>
@@ -10,7 +10,7 @@
 <h3>Figure 1 · 整体任务与应用</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure1.png"><img src="/assets/3dworldsimulator/figure1.png" alt="Figure 1：统一三维状态生成多视角 RGB-D 与触觉观测，并支持多种机器人操作任务" loading="lazy"></a><figcaption>Figure 1 · 3D World Simulator 整体框架，摘自原论文首页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf#page=1">查看原论文 Figure 1（PDF 首页）</a></p>
+
 <p><strong>读图重点：</strong></p>
 <ul>
 <li><strong>中央：</strong> Action-conditioned 3D World Simulation，表示机器人动作条件下的三维世界预测。</li>
@@ -262,32 +262,32 @@
 <h3>Figure 3 · 多视角预测对比</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure3.png"><img src="/assets/3dworldsimulator/figure3.png" alt="Figure 3 · 多视角预测对比" loading="lazy"></a><figcaption>Figure 3 · 多视角预测对比，摘自原论文第 6 页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf">查看原论文 Figure 3（PDF）</a></p>
+
 <p><strong>读图重点：</strong> 比较 Part Assembly 和 Cloth Folding 在 Front、Top、Wrist 不同视角下的预测。</p>
 <p>重点观察作者方法与 4DGen、IWS、Cosmos 在长序列预测中出现的多视角不一致、视觉形变和结构错误。</p>
 <h3>Figure 4 · 三维点云预测对比</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure4.png"><img src="/assets/3dworldsimulator/figure4.png" alt="Figure 4 · 三维点云预测对比" loading="lazy"></a><figcaption>Figure 4 · 三维点云预测对比，摘自原论文第 6 页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf">查看原论文 Figure 4（PDF）</a></p>
+
 <p><strong>读图重点：</strong> 比较 Marker Insertion、Rope Threading、T Pushing 的预测点云与真实点云。</p>
 <p>这一张与你关注的 Flying Points 问题最相关。</p>
 <p>重点观察离群点、几何结构偏移、缺失区域，以及长时间自回归预测造成的误差。</p>
 <h3>Figure 6 · 用世界模型生成数据训练机器人策略</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure6.png"><img src="/assets/3dworldsimulator/figure6.png" alt="Figure 6 · 用世界模型生成数据训练机器人策略" loading="lazy"></a><figcaption>Figure 6 · 用世界模型生成数据训练机器人策略，摘自原论文第 8 页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf">查看原论文 Figure 6（PDF）</a></p>
+
 <p><strong>读图重点：</strong> 比较使用真实世界数据与世界模型生成数据训练策略，最后在真实机器人上的任务成功率。</p>
 <h3>Figure 7 · 仿真与真实世界的策略评估相关性</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure7.png"><img src="/assets/3dworldsimulator/figure7.png" alt="Figure 7 · 仿真与真实世界的策略评估相关性" loading="lazy"></a><figcaption>Figure 7 · 仿真与真实世界的策略评估相关性，摘自原论文第 9 页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf">查看原论文 Figure 7（PDF）</a></p>
+
 <p><strong>读图重点：</strong> 横轴为真实世界成功率，纵轴为世界模型中的成功率。</p>
 <p>论文也包含 π0.5 等 Policy 的评估结果。</p>
 <p>这张图的意义是判断世界模型能否成为真实机器人策略评估的代理环境。</p>
 <h3>Figure 8 · 未见物体的模型规划</h3>
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure8.png"><img src="/assets/3dworldsimulator/figure8.png" alt="Figure 8 · 未见物体的模型规划" loading="lazy"></a><figcaption>Figure 8 · 未见物体的模型规划，摘自原论文第 9 页。</figcaption></figure>
 
-<p><a href="https://jwang771.github.io/3dworldsimulator/paper.pdf">查看原论文 Figure 8（PDF）</a></p>
+
 <p><strong>读图重点：</strong> Initial State、Planning、Final State 和 Target。</p>
 <p>用于理解作者如何将世界模型用于未见物体的规划任务。</p>
 <hr>
@@ -310,7 +310,9 @@
 <p>原论文不使用，主要采用直接的下一状态 Latent 预测。</p>
 <p><strong>理解测试累计：34/37。</strong></p>
 <hr>
-<h2>八、我的研究设想（简记）</h2>
+<aside class="research-notes" aria-label="我的研究设想">
+
+<p><strong>我的研究设想</strong></p>
 <p><strong>1. 自适应 Voxel 与多尺度 Latent</strong></p>
 <p>尝试使用粗体素描述整体运动，在接触、折叠及不确定性较高的区域保留精细特征，降低计算量。</p>
 <p><strong>2. VGGT 置信度与 Consistency Loss</strong></p>
@@ -323,4 +325,5 @@
 <p>在已有 Dynamics Model 基础上尝试 Flow Matching，用于未来 Voxel Latent 生成或残差修正，评估预测质量与额外推理成本。</p>
 <p><strong>总体目标：</strong> 探索一种计算效率更高、抗飞点能力更强、长期动态预测更稳定的三维世界模型。</p>
 <p><em>上述内容均为待验证的研究设想，并非原论文已实现的模块或已证实的创新。</em></p>
-<h2>关联论文</h2><ul><li><a href="/papers/pi05/">π0.5：面向开放世界的机器人操作</a></li></ul></div></main><script src="/assets/app.js?v=close-polish" defer></script></html>
+</aside>
+<h2>关联论文</h2><ul><li><a href="/papers/pi05/">π0.5：面向开放世界的机器人操作</a></li></ul></div></main><script src="/assets/app.js?v=research-notes" defer></script></html>

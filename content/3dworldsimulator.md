@@ -34,7 +34,6 @@ related: ['pi05']
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure1.png"><img src="/assets/3dworldsimulator/figure1.png" alt="Figure 1：统一三维状态生成多视角 RGB-D 与触觉观测，并支持多种机器人操作任务" loading="lazy"></a><figcaption>Figure 1 · 3D World Simulator 整体框架，摘自原论文首页。</figcaption></figure>
 
-[查看原论文 Figure 1（PDF 首页）](https://jwang771.github.io/3dworldsimulator/paper.pdf#page=1)
 
 **读图重点：**
 
@@ -372,7 +371,6 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure3.png"><img src="/assets/3dworldsimulator/figure3.png" alt="Figure 3 · 多视角预测对比" loading="lazy"></a><figcaption>Figure 3 · 多视角预测对比，摘自原论文第 6 页。</figcaption></figure>
 
-[查看原论文 Figure 3（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较 Part Assembly 和 Cloth Folding 在 Front、Top、Wrist 不同视角下的预测。
 
@@ -382,7 +380,6 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure4.png"><img src="/assets/3dworldsimulator/figure4.png" alt="Figure 4 · 三维点云预测对比" loading="lazy"></a><figcaption>Figure 4 · 三维点云预测对比，摘自原论文第 6 页。</figcaption></figure>
 
-[查看原论文 Figure 4（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较 Marker Insertion、Rope Threading、T Pushing 的预测点云与真实点云。
 
@@ -394,7 +391,6 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure6.png"><img src="/assets/3dworldsimulator/figure6.png" alt="Figure 6 · 用世界模型生成数据训练机器人策略" loading="lazy"></a><figcaption>Figure 6 · 用世界模型生成数据训练机器人策略，摘自原论文第 8 页。</figcaption></figure>
 
-[查看原论文 Figure 6（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较使用真实世界数据与世界模型生成数据训练策略，最后在真实机器人上的任务成功率。
 
@@ -402,7 +398,6 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure7.png"><img src="/assets/3dworldsimulator/figure7.png" alt="Figure 7 · 仿真与真实世界的策略评估相关性" loading="lazy"></a><figcaption>Figure 7 · 仿真与真实世界的策略评估相关性，摘自原论文第 9 页。</figcaption></figure>
 
-[查看原论文 Figure 7（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 横轴为真实世界成功率，纵轴为世界模型中的成功率。
 
@@ -414,7 +409,6 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 <figure class="paper-figure"><a href="/assets/3dworldsimulator/figure8.png"><img src="/assets/3dworldsimulator/figure8.png" alt="Figure 8 · 未见物体的模型规划" loading="lazy"></a><figcaption>Figure 8 · 未见物体的模型规划，摘自原论文第 9 页。</figcaption></figure>
 
-[查看原论文 Figure 8（PDF）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** Initial State、Planning、Final State 和 Target。
 
@@ -460,7 +454,9 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 
 ---
 
-## 八、我的研究设想（简记）
+<aside class="research-notes" aria-label="我的研究设想">
+
+**我的研究设想**
 
 **1. 自适应 Voxel 与多尺度 Latent**
 
@@ -485,3 +481,5 @@ Dynamics Model 则需要时间连续的真实状态序列和对应机器人动�
 **总体目标：** 探索一种计算效率更高、抗飞点能力更强、长期动态预测更稳定的三维世界模型。
 
 *上述内容均为待验证的研究设想，并非原论文已实现的模块或已证实的创新。*
+
+</aside>

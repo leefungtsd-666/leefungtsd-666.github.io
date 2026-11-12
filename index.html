@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=close-polish"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><a class="site-name" href="/">🌰小站</a><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">2 张卡片</p><section class="cards"><article data-id="3dworldsimulator" data-tags="[&quot;世界模型&quot;,&quot;三维重建&quot;,&quot;机器人&quot;]" data-search="3d world simulator：粒子与体素混合的三维世界模型 用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。 hybrid particle-voxel dynamics 将三维表示学习与动作条件动力学分为两个主要阶段：先用混合粒子—体素自编码器压缩和重建场景，再在固定空间结构的 voxel latent 中预测未来状态。笔记涵盖架构、训练损失、自回归预测、数据与张量信息流，并记录自适应体素、抗飞点重建和 flow matching 后训练等个人研究设想。 
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="以简洁的 Markdown 论文卡片记录核心方法，快速复习与关联思考。"><title>首页 · 🌰小站</title><link rel="stylesheet" href="/assets/style.css?v=research-notes"><link rel="stylesheet" href="/assets/katex/katex.min.css"><header><a href="/">🌰小站</a><button id="theme" aria-label="切换深色模式">深色模式</button></header><main><div class="search-top"><a class="site-name" href="/">🌰小站</a><label class="sr-only" for="search">搜索论文、方法或关键词</label><input id="search" type="search" placeholder="搜索论文、方法或关键词…"></div><p id="count" class="sr-only" role="status">2 张卡片</p><section class="cards"><article data-id="3dworldsimulator" data-tags="[&quot;世界模型&quot;,&quot;三维重建&quot;,&quot;机器人&quot;]" data-search="3d world simulator：粒子与体素混合的三维世界模型 用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。 hybrid particle-voxel dynamics 将三维表示学习与动作条件动力学分为两个主要阶段：先用混合粒子—体素自编码器压缩和重建场景，再在固定空间结构的 voxel latent 中预测未来状态。笔记涵盖架构、训练损失、自回归预测、数据与张量信息流，并记录自适应体素、抗飞点重建和 flow matching 后训练等个人研究设想。 
 **论文：** hybrid particle-voxel dynamics for multimodal 3d world simulation  
 **作者：** jimmy wang et al.  
 **发表：** arxiv，2026.11  
@@ -26,7 +26,6 @@
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure1.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure1.png&quot; alt=&quot;figure 1：统一三维状态生成多视角 rgb-d 与触觉观测，并支持多种机器人操作任务&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 1 · 3d world simulator 整体框架，摘自原论文首页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 1（pdf 首页）](https://jwang771.github.io/3dworldsimulator/paper.pdf#page=1)
 
 **读图重点：**
 
@@ -364,7 +363,6 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure3.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure3.png&quot; alt=&quot;figure 3 · 多视角预测对比&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 3 · 多视角预测对比，摘自原论文第 6 页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 3（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较 part assembly 和 cloth folding 在 front、top、wrist 不同视角下的预测。
 
@@ -374,7 +372,6 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure4.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure4.png&quot; alt=&quot;figure 4 · 三维点云预测对比&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 4 · 三维点云预测对比，摘自原论文第 6 页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 4（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较 marker insertion、rope threading、t pushing 的预测点云与真实点云。
 
@@ -386,7 +383,6 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure6.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure6.png&quot; alt=&quot;figure 6 · 用世界模型生成数据训练机器人策略&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 6 · 用世界模型生成数据训练机器人策略，摘自原论文第 8 页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 6（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 比较使用真实世界数据与世界模型生成数据训练策略，最后在真实机器人上的任务成功率。
 
@@ -394,7 +390,6 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure7.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure7.png&quot; alt=&quot;figure 7 · 仿真与真实世界的策略评估相关性&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 7 · 仿真与真实世界的策略评估相关性，摘自原论文第 9 页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 7（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** 横轴为真实世界成功率，纵轴为世界模型中的成功率。
 
@@ -406,7 +401,6 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 &lt;figure class=&quot;paper-figure&quot;&gt;&lt;a href=&quot;/assets/3dworldsimulator/figure8.png&quot;&gt;&lt;img src=&quot;/assets/3dworldsimulator/figure8.png&quot; alt=&quot;figure 8 · 未见物体的模型规划&quot; loading=&quot;lazy&quot;&gt;&lt;/a&gt;&lt;figcaption&gt;figure 8 · 未见物体的模型规划，摘自原论文第 9 页。&lt;/figcaption&gt;&lt;/figure&gt;
 
-[查看原论文 figure 8（pdf）](https://jwang771.github.io/3dworldsimulator/paper.pdf)
 
 **读图重点：** initial state、planning、final state 和 target。
 
@@ -452,7 +446,9 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 
 ---
 
-## 八、我的研究设想（简记）
+&lt;aside class=&quot;research-notes&quot; aria-label=&quot;我的研究设想&quot;&gt;
+
+**我的研究设想**
 
 **1. 自适应 voxel 与多尺度 latent**
 
@@ -477,6 +473,8 @@ dynamics model 则需要时间连续的真实状态序列和对应机器人动�
 **总体目标：** 探索一种计算效率更高、抗飞点能力更强、长期动态预测更稳定的三维世界模型。
 
 *上述内容均为待验证的研究设想，并非原论文已实现的模块或已证实的创新。*
+
+&lt;/aside&gt;
  世界模型 三维重建 机器人"><details class="paper-card"><summary><h2>3D World Simulator：粒子与体素混合的三维世界模型</h2><p>用粒子保留精细几何，在体素隐空间预测动作引起的世界变化，统一生成三维、视觉与触觉观测。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>Hybrid Particle-Voxel Dynamics 将三维表示学习与动作条件动力学分为两个主要阶段：先用混合粒子—体素自编码器压缩和重建场景，再在固定空间结构的 Voxel Latent 中预测未来状态。笔记涵盖架构、训练损失、自回归预测、数据与张量信息流，并记录自适应体素、抗飞点重建和 Flow Matching 后训练等个人研究设想。</p><a class="read" href="/papers/3dworldsimulator/">详情 →</a></div></details></article><article data-id="pi05" data-tags="[&quot;VLA&quot;,&quot;机器人&quot;,&quot;Flow Matching&quot;]" data-search="π0.5：面向开放世界的机器人操作 通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。 π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 fast 离散动作监督，后训练引入 flow matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、attention mask 与 kv cache，并用两轮闭环实例串联完整信息流。 
 &gt; 按 kelip-paper-reading 的六站路线整理：动机 → 架构 → 训练 → 数据 → 信息流 → 两轮闭环实例。
 &gt; 整理与公开实现核对日期：2026-11-11。论文以 arxiv:2504.16054 v1 为准；代码为当日读取的 openpi main，未固定 commit，不能视为永久不变的接口。
@@ -916,4 +914,4 @@ x(τ=1) → x(0.9) → ... → x(0) → 适配成机器人动作
 - [tokenizer.py](https://github.com/physical-intelligence/openpi/blob/main/src/openpi/models/tokenizer.py)：`paligemmatokenizer.tokenize` 的状态文本化；`fasttokenizer` 的离散动作接口。
 
 本文配图取自 π0.5 论文 v1，并保留自包含文字流程图辅助复习。所有教学数值已与论文报告和代码参数分开；复现实验时仍应固定代码 commit、模型配置、统计量与机器人接口。
- vla 机器人 flow matching"><details class="paper-card"><summary><h2>π0.5：面向开放世界的机器人操作</h2><p>通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 FAST 离散动作监督，后训练引入 Flow Matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、Attention Mask 与 KV Cache，并用两轮闭环实例串联完整信息流。</p><a class="read" href="/papers/pi05/">详情 →</a></div></details></article></section><p id="empty" hidden>没有匹配的卡片，试试其他关键词。</p></main><script src="/assets/app.js?v=close-polish" defer></script></html>
+ vla 机器人 flow matching"><details class="paper-card"><summary><h2>π0.5：面向开放世界的机器人操作</h2><p>通过异构数据共同训练与高低层协同，让机器人在未见过的家庭中理解任务并执行连续动作。</p><span class="expand-hint">展开摘要</span></summary><div class="abstract"><h3>摘要</h3><p>π0.5 面向开放世界中的机器人泛化，将不同机器人、不同环境、网络视觉语言任务与高层语义监督汇入同一个视觉—语言—动作模型。模型结合语义子任务预测与低层连续动作生成：预训练采用 FAST 离散动作监督，后训练引入 Flow Matching 动作专家。本文精读笔记梳理其架构、训练目标、数据形式、Attention Mask 与 KV Cache，并用两轮闭环实例串联完整信息流。</p><a class="read" href="/papers/pi05/">详情 →</a></div></details></article></section><p id="empty" hidden>没有匹配的卡片，试试其他关键词。</p></main><script src="/assets/app.js?v=research-notes" defer></script></html>
